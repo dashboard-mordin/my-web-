@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบฐานข้อมูลโครงการเกษตรอินทรีย์ในโรงเรียน</title>
+    
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <style>
+        /* ตั้งค่าพื้นฐาน */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6f9;
+            color: #333;
+        }
+
+        /* ส่วนหัวของเว็บไซต์ (Header) */
+        .header {
+            background-color: #1b5e20;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 20px;
+            min-height: 60px;
+        }
+        .header-logo {
+            height: 70px;
+            width: 70px; 
+            background-color: white;
+            border-radius: 50%;
+            padding: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            object-fit: contain;
+        }
+        .header-title {
+            text-align: left;
+        }
+        .header-title h1 { margin: 0; font-size: 22px; }
+        .header-title p { margin: 0; font-size: 14px; color: #a5d6a7; }
+
+        /* แถบกรองข้อมูล (Filter Bar) */
+        .filter-bar {
+            background-color: #ffffff;
+            padding: 15px 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .filter-label { font-weight: bold; color: #555; }
+        
+        .filter-select, .search-input {
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            background-color: #f8f9fa;
+            font-size: 14px;
+            outline: none;
+            color: #000; 
+        }
+        .filter-select { min-width: 140px; cursor: pointer; }
+        .filter-select:focus, .search-input:focus {
+            border-color: #4caf50;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+        .btn-filter {
+            padding: 8px 20px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-filter:hover { background-color: #388e3c; }
+
+        /* ปุ่มล้างตัวกรอง */
+        .btn-clear {
+            padding: 8px 20px;
+            background-color: #757575; 
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-clear:hover { background-color: #616161; }
+
+        /* 🟢 ตกแต่งปุ่ม Export Excel */
+        .btn-export {
+            padding: 8px 20px;
+            background-color: #1d6f42; /* สีเขียว Excel */
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-export:hover { background-color: #144e2e; }
+
+        /* ตกแต่ง Select2 ให้หน้าตาและความสูงพอดีกับกล่องอื่นๆ และสีดำสนิท */
+        .select2-container .select2-selection--single {
+            height: 35px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            background-color: #f8f9fa;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 35px;
+            font-size: 14px;
+            color: #000 !important; 
+        }
+        .select2-container--default .select2-selection--single .select2-selection__placeholder {
+            color: #000 !important; 
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 33px;
+        }
+
+        /* พื้นที่แสดงข้อมูล */
+        .dashboard-content { padding: 20px 30px; }
+
+        /* กล่องค้นหาชื่อโรงเรียน */
+        .search-box-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .search-input { flex-grow: 1; max-width: 400px; padding: 10px 15px; }
+
+        /* กล่องสรุปข้อมูล (Summary Cards) */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .summary-card {
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .summary-title {
+            font-weight: bold;
+            color: #2e7d32;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .summary-value {
+            font-size: 38px;
+            font-weight: bold;
+            color: #1b5e20;
+        }
+        .card-area { background-color: #e6ee9c; border-radius: 8px; }
+        .card-school { background-color: #c8e6c9; border-radius: 8px; }
+        .card-target { background-color: #ffccbc; border: 4px solid #1b5e20; border-radius: 40px; }
+
+        /* ตารางข้อมูล */
+        .table-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+        .table-container h3 { margin-top: 0; color: #2e7d32; border-bottom: 2px solid #e0e0e0; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
+        th { background-color: #f1f8e9; color: #33691e; white-space: nowrap; }
+        tr:hover { background-color: #f9f9f9; }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <img src="https://i.postimg.cc/CLqYPRBp/sanea-khxng-loko-kes'tr-x-nthr-y-ni-rong-re-yn-(2).png" alt="โลโก้เกษตรอินทรีย์" class="header-logo">
+        
+        <div class="header-title">
+            <h1>ระบบฐานข้อมูลโครงการเกษตรอินทรีย์ในโรงเรียน</h1>
+            <p>กรมพัฒนาที่ดิน — Land Development Department</p>
+        </div>
+    </header>
+
+    <div class="filter-bar">
+        <span class="filter-label">🔍 กรองข้อมูล:</span>
+
+        <select id="statusFilter" class="filter-select" onchange="filterLocalData()">
+            <option value="">-- สถานะโรงเรียนทั้งหมด --</option>
+            <option value="โรงเรียนใหม่">โรงเรียนใหม่</option>
+            <option value="โรงเรียนต่อยอด">โรงเรียนต่อยอด</option>
+        </select>
+
+        <select id="spkFilter" class="filter-select" onchange="filterLocalData()">
+            <option value="">-- ทุกหน่วยงาน (สพข.) --</option>
+        </select>
+
+        <select id="spdFilter" class="filter-select">
+            <option value="">-- ทุก สพด. --</option>
+        </select>
+
+        <select id="yearFilter" class="filter-select" onchange="filterLocalData()">
+            <option value="">-- ทุกปีงบประมาณที่เข้าร่วม --</option>
+        </select>
+
+        <button class="btn-filter" onclick="fetchData()">ดึงข้อมูล</button>
+        <button class="btn-clear" onclick="clearFilters()">ล้างตัวกรอง</button>
+        
+        <button class="btn-export" onclick="exportToExcel()">📥 โหลด Excel</button>
+    </div>
+
+    <div class="dashboard-content">
+        
+        <div class="search-box-container">
+            <span class="filter-label">🏫 ชื่อโรงเรียน:</span>
+            <input type="text" id="schoolSearch" class="search-input" placeholder="พิมพ์ชื่อโรงเรียนที่ต้องการค้นหา..." onkeyup="filterLocalData()">
+            <span style="font-size: 12px; color: #888;">(พิมพ์แล้วระบบจะค้นหาจากข้อมูลที่ดึงมาให้ทันที)</span>
+        </div>
+
+        <div class="summary-cards">
+            <div class="summary-card card-area">
+                <div class="summary-title">พื้นที่การเกษตร (ไร่)</div>
+                <div class="summary-value" id="totalArea">0.00</div>
+            </div>
+            <div class="summary-card card-school">
+                <div class="summary-title">จำนวนโรงเรียน (แห่ง)</div>
+                <div class="summary-value" id="totalSchool">0</div>
+            </div>
+            <div class="summary-card card-target">
+                <div class="summary-title">เป้าหมายโรงเรียนต่อยอด</div>
+                <div class="summary-value">500</div>
+            </div>
+            <div class="summary-card card-target">
+                <div class="summary-title">เป้าหมายโรงเรียนใหม่</div>
+                <div class="summary-value">100</div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <h3>ข้อมูลของโรงเรียน</h3>
+            <table id="dataTable">
+                <thead id="tableHead">
+                    <tr>
+                        <th>ตารางข้อมูล</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTableBody">
+                    <tr>
+                        <td style="text-align: center; color: #666; padding: 30px;">กรุณากดปุ่ม "ดึงข้อมูล" ด้านบน เพื่อโหลดข้อมูลจาก Google Sheets</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script>
+        // สร้างตัวเลือก ปีที่เข้าร่วมโครงการ
+        const yearSelect = document.getElementById('yearFilter');
+        const currentYearTh = new Date().getFullYear() + 543;
+        for (let y = currentYearTh - 19; y <= currentYearTh + 2; y++) {
+            let option = document.createElement('option');
+            option.value = y; option.text = "ปี " + y;
+            yearSelect.appendChild(option);
+        }
+
+        // สร้างตัวเลือก สพข. 1-12
+        const spkSelect = document.getElementById('spkFilter');
+        for (let i = 1; i <= 12; i++) {
+            let option = document.createElement('option');
+            option.value = String(i); 
+            option.text = `สพข.${i}`;
+            spkSelect.appendChild(option);
+        }
+
+        // นำข้อมูลจังหวัดใส่เข้า Dropdown (Select)
+        const provinces = ["กรุงเทพมหานคร","กระบี่","กาญจนบุรี","กาฬสินธุ์","กำแพงเพชร","ขอนแก่น","จันทบุรี","ฉะเชิงเทรา","ชลบุรี","ชัยนาท","ชัยภูมิ","ชุมพร","เชียงราย","เชียงใหม่","ตรัง","ตราด","ตาก","นครนายก","นครปฐม","นครพนม","นครราชสีมา","นครศรีธรรมราช","นครสวรรค์","นนทบุรี","นราธิวาส","น่าน","บึงกาฬ","บุรีรัมย์","ปทุมธานี","ประจวบคีรีขันธ์","ปราจีนบุรี","ปัตตานี","พระนครศรีอยุธยา","พะเยา","พังงา","พัทลุง","พิจิตร","พิษณุโลก","เพชรบุรี","เพชรบูรณ์","แพร่","ภูเก็ต","มหาสารคาม","มุกดาหาร","แม่ฮ่องสอน","ยโสธร","ยะลา","ร้อยเอ็ด","ระนอง","ระยอง","ราชบุรี","ลพบุรี","ลำปาง","ลำพูน","เลย","ศรีสะเกษ","สกลนคร","สงขลา","สตูล","สมุทรปราการ","สมุทรสงคราม","สมุทรสาคร","สระแก้ว","สระบุรี","สิงห์บุรี","สุโขทัย","สุพรรณบุรี","สุราษฎร์ธานี","สุรินทร์","หนองคาย","หนองบัวลำภู","อ่างทอง","อำนาจเจริญ","อุดรธานี","อุตรดิตถ์","อุทัยธานี","อุบลราชธานี"];
+        const spdSelect = document.getElementById('spdFilter');
+        provinces.forEach(province => {
+            let option = document.createElement('option');
+            option.value = province; option.text = province;
+            spdSelect.appendChild(option);
+        });
+
+        // เปิดใช้งาน Select2 
+        $(document).ready(function() {
+            $('#spdFilter').select2({
+                width: '180px' 
+            });
+            $('#spdFilter').on('change', function() {
+                filterLocalData();
+            });
+        });
+
+        // ลิงก์ API
+        const API_URL = "https://script.google.com/macros/s/AKfycbyio_q0ZKRs2_8-PtwT6wt9vsYRFtuT7dMwpkxMpy3WBlX7Dyv62a33QZpmfHMxVYqlAA/exec";
+        
+        let globalData = []; 
+
+        // ฟังก์ชันดึงข้อมูลหลัก
+        async function fetchData() {
+            const tbody = document.getElementById('dataTableBody');
+            
+            tbody.innerHTML = '<tr><td style="text-align: center;">กำลังโหลดข้อมูลจากระบบ...</td></tr>';
+            
+            try {
+                const response = await fetch(API_URL);
+                globalData = await response.json(); 
+                
+                filterLocalData(); 
+            } catch (error) {
+                console.error("Error:", error);
+                tbody.innerHTML = '<tr><td style="text-align: center; color: red;">เกิดข้อผิดพลาดในการดึงข้อมูล โปรดตรวจสอบ API</td></tr>';
+            }
+        }
+
+        // ฟังก์ชันล้างตัวกรอง
+        function clearFilters() {
+            document.getElementById('statusFilter').value = "";
+            document.getElementById('spkFilter').value = "";
+            document.getElementById('yearFilter').value = "";
+            document.getElementById('schoolSearch').value = "";
+            
+            $('#spdFilter').val("").trigger("change.select2");
+            
+            filterLocalData();
+        }
+
+        // 🟢 ฟังก์ชันดาวน์โหลด Excel
+        function exportToExcel() {
+            // เช็คก่อนว่ามีข้อมูลถูกดึงมาหรือยัง
+            if (globalData.length === 0) {
+                alert("กรุณากด 'ดึงข้อมูล' ก่อนทำการดาวน์โหลดครับ");
+                return;
+            }
+
+            // ชี้เป้าไปที่ตารางที่เราต้องการดึงข้อมูล
+            let tableElement = document.getElementById("dataTable");
+            
+            // แปลง HTML Table เป็นข้อมูลแบบ Workbook (ไฟล์ Excel)
+            let wb = XLSX.utils.table_to_book(tableElement, { sheet: "ข้อมูลโรงเรียน" });
+            
+            // สั่งให้ดาวน์โหลดออกมาเป็นไฟล์ .xlsx
+            XLSX.writeFile(wb, "ฐานข้อมูลโครงการเกษตรอินทรีย์.xlsx");
+        }
+
+        // ฟังก์ชันสำหรับกรองข้อมูล
+        function filterLocalData() {
+            if(globalData.length === 0) return;
+
+            const filterYear = document.getElementById('yearFilter').value;
+            const filterStatus = document.getElementById('statusFilter').value;
+            const filterSpk = document.getElementById('spkFilter').value;
+            const filterSpd = document.getElementById('spdFilter').value;
+            const searchText = document.getElementById('schoolSearch').value.trim().toLowerCase();
+
+            // คัดแยกข้อมูลตามเงื่อนไข
+            const filteredData = globalData.filter(row => {
+                let matchYear = filterYear === "" || String(row["ปีงบประมาณ ที่โรงเรียนเข้าร่วมโครงการ"]) === filterYear;
+                let matchStatus = filterStatus === "" || row["สถานะโรงเรียน"] === filterStatus;
+                let matchSpk = filterSpk === "" || String(row["หน่วยงานที่รับผิดชอบ (สพข.)"]) === filterSpk;
+                let matchSpd = filterSpd === "" || row["สพด. ที่รับผิดชอบ"] === filterSpd;
+                
+                let matchName = true;
+                if (searchText !== "") {
+                    let schoolName = row["ชื่อโรงเรียน"] ? String(row["ชื่อโรงเรียน"]).toLowerCase() : "";
+                    matchName = schoolName.includes(searchText);
+                }
+
+                return matchYear && matchStatus && matchSpk && matchSpd && matchName;
+            });
+
+            let totalAreaSum = 0;
+            const totalSchoolCount = filteredData.length;
+
+            filteredData.forEach(row => {
+                let area = parseFloat(row["พื้นที่ทำการเกษตร (ไร่)"]);
+                if (!isNaN(area)) {
+                    totalAreaSum += area;
+                }
+            });
+
+            document.getElementById('totalSchool').innerText = totalSchoolCount.toLocaleString();
+            document.getElementById('totalArea').innerText = totalAreaSum.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            renderTable(filteredData);
+        }
+
+        // ฟังก์ชันวาดตารางแบบไดนามิก
+        function renderTable(dataArray) {
+            const thead = document.getElementById('tableHead');
+            const tbody = document.getElementById('dataTableBody');
+
+            if (dataArray.length > 0) {
+                const headers = Object.keys(dataArray[0]);
+                let headHtml = '<tr>';
+                headers.forEach(header => {
+                    headHtml += `<th>${header}</th>`;
+                });
+                headHtml += '</tr>';
+                thead.innerHTML = headHtml;
+
+                let bodyHtml = '';
+                dataArray.forEach(row => {
+                    bodyHtml += '<tr>';
+                    headers.forEach(header => {
+                        let cellData = row[header] !== undefined && row[header] !== "" ? row[header] : '-';
+                        bodyHtml += `<td>${cellData}</td>`;
+                    });
+                    bodyHtml += '</tr>';
+                });
+                tbody.innerHTML = bodyHtml;
+            } else {
+                thead.innerHTML = '<tr><th>ผลการค้นหา</th></tr>';
+                tbody.innerHTML = '<tr><td style="text-align: center;">ไม่พบข้อมูลโรงเรียนที่ตรงกับเงื่อนไขการค้นหา</td></tr>';
+            }
+        }
+    </script>
+</body>
+</html>
