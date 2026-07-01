@@ -148,9 +148,9 @@
             margin-bottom: 25px;
         }
 
-        /* 🟢 กล่องกราฟ - อัปเดตสีพื้นหลังให้เต็มกล่อง */
+        /* กล่องกราฟแบบมีลายน้ำ */
         .chart-box {
-            background-color: #f4f8f4; /* 🟢 สีเขียวอ่อนสุดๆ กระจายเต็มกล่อง */
+            background-color: #f4f8f4;
             padding: 20px; border-radius: 16px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
             display: flex; flex-direction: column; align-items: center;
@@ -159,7 +159,6 @@
         }
         .chart-box.full-width { grid-column: 1 / -1; }
         
-        /* ลายน้ำยังคงอยู่หลังสุด */
         .chart-box::before {
             content: "";
             position: absolute; top: 0; left: 0; right: 0; bottom: 0;
@@ -178,28 +177,46 @@
             padding-bottom: 10px; text-align: center; width: 100%; font-size: 17px;
         }
         
-        /* 🟢 เอาสีพื้นหลังส่วนเกินใน wrapper ย่อยๆ ออก ให้โปร่งใสไปเห็นสีเต็มกล่อง */
-        .canvas-wrapper { 
-            position: relative; width: 100%; max-width: 300px; height: 260px; margin: 0 auto;
-        }
-        .bar-wrapper, .line-wrapper { 
-            position: relative; width: 100%; height: 260px;
-        }
-        #thailand_map_div {
-            width: 100%; height: 450px; display: flex; justify-content: center;
-        }
+        .canvas-wrapper { position: relative; width: 100%; max-width: 300px; height: 260px; margin: 0 auto; }
+        .bar-wrapper, .line-wrapper { position: relative; width: 100%; height: 260px; }
+        #thailand_map_div { width: 100%; height: 450px; display: flex; justify-content: center; }
 
-        /* ตารางข้อมูล */
+        /* 🟢 กล่องครอบตาราง (เปลี่ยนการตั้งค่าให้ล็อกหัวและจำกัดความสูง) */
         .table-container {
             background-color: rgba(255, 255, 255, 0.9); padding: 25px; border-radius: 16px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow-x: auto;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px;
             border: 1px solid #fff;
         }
-        .table-container h3 { margin-top: 0; color: #2e7d32; border-bottom: 2px dashed #c8e6c9; padding-bottom: 10px; }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        .table-container h3 { 
+            margin-top: 0; color: #2e7d32; border-bottom: 2px dashed #c8e6c9; 
+            padding-bottom: 10px; margin-bottom: 15px; 
+        }
+
+        /* 🟢 โค้ดสำหรับทำตารางเลื่อนได้ (Scrollable) */
+        .table-wrapper {
+            max-height: 500px; /* สามารถปรับความสูงตรงนี้ได้ */
+            overflow-y: auto; /* เลื่อนบน-ล่าง */
+            overflow-x: auto; /* เลื่อนซ้าย-ขวา */
+            border-radius: 8px;
+            border: 1px solid #e0e0e0; /* กรอบบางๆ รอบตาราง */
+        }
+
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; /* กำหนดความกว้างขั้นต่ำให้มี scroll แนวนอน */ }
         th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
-        th { background-color: #f1f8e9; color: #2e7d32; white-space: nowrap; font-weight: bold; }
-        tr:hover { background-color: #fdfbf7; }
+        
+        /* 🟢 โค้ดสำหรับล็อกหัวตาราง (Sticky Header) */
+        th { 
+            background-color: #e8f5e9; /* พื้นหลังสีเขียวอ่อนทึบแสง (ต้องทึบเพื่อบังเนื้อหาเวลาเลื่อน) */
+            color: #2e7d32; 
+            white-space: nowrap; 
+            font-weight: bold; 
+            position: sticky; 
+            top: 0; /* ติดอยู่ด้านบนสุด */
+            z-index: 10; /* ให้ลอยอยู่เหนือเซลล์อื่นๆ */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* เพิ่มเงาด้านล่างให้ดูมีมิติ */
+        }
+        
+        tbody tr:hover { background-color: #fdfbf7; }
 
         .google-visualization-tooltip {
             border-radius: 8px !important;
@@ -303,14 +320,16 @@
 
             <div class="table-container">
                 <h3>📑 ข้อมูลรายละเอียดของโรงเรียน</h3>
-                <table id="dataTable">
-                    <thead id="tableHead">
-                        <tr><th>ตารางข้อมูล</th></tr>
-                    </thead>
-                    <tbody id="dataTableBody">
-                        <tr><td style="text-align: center; color: #666; padding: 30px;">กำลังประมวลผลข้อมูล...</td></tr>
-                    </tbody>
-                </table>
+                <div class="table-wrapper">
+                    <table id="dataTable">
+                        <thead id="tableHead">
+                            <tr><th>ตารางข้อมูล</th></tr>
+                        </thead>
+                        <tbody id="dataTableBody">
+                            <tr><td style="text-align: center; color: #666; padding: 30px;">กำลังประมวลผลข้อมูล...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
         </div>
