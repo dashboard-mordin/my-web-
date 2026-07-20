@@ -148,14 +148,14 @@
             margin-bottom: 25px;
         }
 
-        /* กล่องกราฟแบบมีลายน้ำ */
+        /* กล่องกราฟแบบไล่สีตาม GAP */
         .chart-box {
-            background-color: #f4f8f4;
+            background: linear-gradient(180deg, #ffffff 0%, #f1f8e9 100%); 
             padding: 20px; border-radius: 16px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
             display: flex; flex-direction: column; align-items: center;
             position: relative; overflow: hidden;
-            border: 1px solid #fff;
+            border: 1px solid rgba(255,255,255,0.8);
         }
         .chart-box.full-width { grid-column: 1 / -1; }
         
@@ -173,7 +173,7 @@
         }
 
         .chart-box h3 { 
-            margin-top: 0; color: #2e7d32; border-bottom: 2px dashed #c8e6c9; 
+            margin-top: 0; color: #2e7d32; border-bottom: 2px dashed rgba(38, 89, 50, 0.2); 
             padding-bottom: 10px; text-align: center; width: 100%; font-size: 17px;
         }
         
@@ -181,53 +181,55 @@
         .bar-wrapper, .line-wrapper { position: relative; width: 100%; height: 260px; }
         #thailand_map_div { width: 100%; height: 450px; display: flex; justify-content: center; }
 
-        /* 🟢 กล่องครอบตาราง (เปลี่ยนการตั้งค่าให้ล็อกหัวและจำกัดความสูง) */
+        /* กล่องตารางแบบไล่สีตาม GAP */
         .table-container {
-            background-color: rgba(255, 255, 255, 0.9); padding: 25px; border-radius: 16px;
+            background: linear-gradient(180deg, #ffffff 0%, #f1f8e9 100%);
+            padding: 25px; border-radius: 16px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px;
-            border: 1px solid #fff;
+            border: 1px solid rgba(255,255,255,0.8);
         }
         .table-container h3 { 
-            margin-top: 0; color: #2e7d32; border-bottom: 2px dashed #c8e6c9; 
+            margin-top: 0; color: #2e7d32; border-bottom: 2px dashed rgba(38, 89, 50, 0.2); 
             padding-bottom: 10px; margin-bottom: 15px; 
         }
 
-        /* 🟢 โค้ดสำหรับทำตารางเลื่อนได้ (Scrollable) */
         .table-wrapper {
-            max-height: 500px; /* สามารถปรับความสูงตรงนี้ได้ */
-            overflow-y: auto; /* เลื่อนบน-ล่าง */
-            overflow-x: auto; /* เลื่อนซ้าย-ขวา */
+            max-height: 500px; 
+            overflow-y: auto; 
+            overflow-x: auto; 
             border-radius: 8px;
-            border: 1px solid #e0e0e0; /* กรอบบางๆ รอบตาราง */
+            border: 1px solid #e0e0e0; 
+            background: white; 
         }
 
-        table { width: 100%; border-collapse: collapse; min-width: 1000px; /* กำหนดความกว้างขั้นต่ำให้มี scroll แนวนอน */ }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
         th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
         
-        /* 🟢 โค้ดสำหรับล็อกหัวตาราง (Sticky Header) */
         th { 
-            background-color: #e8f5e9; /* พื้นหลังสีเขียวอ่อนทึบแสง (ต้องทึบเพื่อบังเนื้อหาเวลาเลื่อน) */
-            color: #2e7d32; 
+            background-color: #2e7d32; 
+            color: #ffffff; 
             white-space: nowrap; 
             font-weight: bold; 
             position: sticky; 
-            top: 0; /* ติดอยู่ด้านบนสุด */
-            z-index: 10; /* ให้ลอยอยู่เหนือเซลล์อื่นๆ */
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* เพิ่มเงาด้านล่างให้ดูมีมิติ */
+            top: 0; 
+            z-index: 10; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
         }
         
-        tbody tr:hover { background-color: #fdfbf7; }
+        tbody tr:hover { background-color: #f1f8e9; }
 
         .google-visualization-tooltip {
             border-radius: 8px !important;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
             border: 1px solid #ccc !important;
             padding: 0 !important;
+            background-color: rgba(255, 255, 255, 0.98) !important;
         }
     </style>
 </head>
 <body>
 
+    <!-- แถบด้านซ้าย (Sidebar) -->
     <aside class="sidebar">
         <header class="header">
             <img src="https://i.postimg.cc/CLqYPRBp/sanea-khxng-loko-kes'tr-x-nthr-y-ni-rong-re-yn-(2).png" alt="โลโก้เกษตรอินทรีย์" class="header-logo">
@@ -269,6 +271,7 @@
         </div>
     </aside>
 
+    <!-- เนื้อหาหลักฝั่งขวา (Main Content) -->
     <main class="main-content">
         <div class="dashboard-content">
 
@@ -291,12 +294,14 @@
                 </div>
             </div>
 
+            <!-- กราฟแผนที่ประเทศไทย -->
             <div class="chart-box full-width" style="margin-bottom: 20px;">
                 <h3>🗺️ แผนที่แสดงความหนาแน่นของพื้นที่ทำการเกษตร (ไร่) แยกตามจังหวัด</h3>
                 <p style="font-size: 12px; color: #888; margin-top: -5px; margin-bottom: 10px;">(สีเข้ม = พื้นที่เกษตรมาก, สีอ่อน = พื้นที่เกษตรน้อย, วางเมาส์เพื่อดูรายละเอียด)</p>
                 <div id="thailand_map_div"></div>
             </div>
 
+            <!-- 3 กราฟด้านล่าง -->
             <div class="charts-grid">
                 <div class="chart-box">
                     <h3>📊 สัดส่วนสถานะโรงเรียน</h3>
@@ -646,6 +651,7 @@
             const ctxBar = document.getElementById('barChart').getContext('2d');
             if (barChartInstance) barChartInstance.destroy();
 
+            // 🟢 อัปเดต: เพิ่มชื่อแกน X และ Y ให้กราฟแท่ง
             barChartInstance = new Chart(ctxBar, {
                 type: 'bar',
                 data: {
@@ -658,7 +664,16 @@
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
-                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
+                    scales: { 
+                        x: {
+                            title: { display: true, text: 'หน่วยงาน (สพข.)', font: { size: 14, weight: 'bold' }, color: '#2e7d32' }
+                        },
+                        y: { 
+                            beginAtZero: true, 
+                            ticks: { stepSize: 1 },
+                            title: { display: true, text: 'จำนวนโรงเรียน (แห่ง)', font: { size: 14, weight: 'bold' }, color: '#2e7d32' }
+                        } 
+                    },
                     plugins: { legend: { display: false } }
                 }
             });
@@ -669,6 +684,7 @@
             const ctxLine = document.getElementById('lineChart').getContext('2d');
             if (lineChartInstance) lineChartInstance.destroy();
 
+            // 🟢 อัปเดต: เพิ่มชื่อแกน X และ Y ให้กราฟเส้น
             lineChartInstance = new Chart(ctxLine, {
                 type: 'line',
                 data: {
@@ -685,8 +701,14 @@
                 options: {
                     responsive: true, maintainAspectRatio: false,
                     scales: {
-                        x: { ticks: { autoSkip: true, maxRotation: 45, minRotation: 45 } },
-                        y: { beginAtZero: true }
+                        x: { 
+                            ticks: { autoSkip: true, maxRotation: 45, minRotation: 45 },
+                            title: { display: true, text: 'ปีงบประมาณที่เข้าร่วมโครงการ', font: { size: 14, weight: 'bold' }, color: '#2e7d32' }
+                        },
+                        y: { 
+                            beginAtZero: true,
+                            title: { display: true, text: 'จำนวนโรงเรียน (แห่ง)', font: { size: 14, weight: 'bold' }, color: '#2e7d32' }
+                        }
                     },
                     plugins: { legend: { display: false } }
                 }
@@ -730,4 +752,4 @@
         }
     </script>
 </body>
-</html>>
+</html>
