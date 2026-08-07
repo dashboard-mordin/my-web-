@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบฐานข้อมูลโครงการเกษตรอินทรีย์ในโรงเรียน</title>
     
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -18,7 +19,7 @@
     <style>
         /* ตั้งค่าพื้นหลังเว็บให้เป็นสีครีมเอิร์ธโทนแบบไล่ระดับ */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Sarabun', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
             background: linear-gradient(135deg, #fdfbf7 0%, #f4f1ea 100%);
@@ -75,6 +76,7 @@
             box-sizing: border-box;
             padding: 10px 12px; border: 1px solid #ced4da; border-radius: 8px;
             background-color: #f8f9fa; font-size: 14px; outline: none; color: #000; 
+            font-family: 'Sarabun', sans-serif;
         }
         .filter-select:focus, .search-input:focus {
             border-color: #4caf50; box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
@@ -91,6 +93,7 @@
             padding: 12px 20px; color: white; border: none; border-radius: 8px;
             cursor: pointer; font-weight: bold; transition: all 0.2s;
             width: 100%; text-align: center;
+            font-family: 'Sarabun', sans-serif;
         }
         .btn-clear { background-color: #795548; } 
         .btn-clear:hover { background-color: #5d4037; transform: translateY(-2px); }
@@ -104,7 +107,7 @@
         }
         .select2-container--default .select2-selection--single .select2-selection__rendered,
         .select2-container--default .select2-selection--single .select2-selection__placeholder {
-            line-height: 38px; font-size: 14px; color: #000 !important; 
+            line-height: 38px; font-size: 14px; color: #000 !important; font-family: 'Sarabun', sans-serif;
         }
         .select2-container--default .select2-selection--single .select2-selection__arrow { height: 36px; }
 
@@ -148,7 +151,7 @@
             margin-bottom: 25px;
         }
 
-        /* กล่องกราฟแบบไล่สีตาม GAP */
+        /* กล่องกราฟ - อัปเดตสีพื้นหลังไล่สีขาวลงเขียวแบบ GAP */
         .chart-box {
             background: linear-gradient(180deg, #ffffff 0%, #f1f8e9 100%); 
             padding: 20px; border-radius: 16px;
@@ -181,7 +184,7 @@
         .bar-wrapper, .line-wrapper { position: relative; width: 100%; height: 260px; }
         #thailand_map_div { width: 100%; height: 450px; display: flex; justify-content: center; }
 
-        /* กล่องตารางแบบไล่สีตาม GAP */
+        /* กล่องตาราง */
         .table-container {
             background: linear-gradient(180deg, #ffffff 0%, #f1f8e9 100%);
             padding: 25px; border-radius: 16px;
@@ -202,8 +205,14 @@
             background: white; 
         }
 
+        /* 🟢 แก้ไข CSS ของตาราง ให้มีเส้นขอบกั้นระหว่างคอลัมน์ */
         table { width: 100%; border-collapse: collapse; min-width: 1000px; }
-        th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
+        th, td { 
+            padding: 14px 12px; 
+            text-align: left; 
+            border: 1px solid #e0e0e0; /* 🟢 เปลี่ยนเป็นใส่เส้นขอบรอบด้าน */
+            font-size: 14px; 
+        }
         
         th { 
             background-color: #2e7d32; 
@@ -214,6 +223,7 @@
             top: 0; 
             z-index: 10; 
             box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            border-color: #1b5e20; /* 🟢 ปรับสีเส้นขอบของส่วนหัวตารางให้เข้ากับพื้นหลังเขียว */
         }
         
         tbody tr:hover { background-color: #f1f8e9; }
@@ -229,7 +239,6 @@
 </head>
 <body>
 
-    <!-- แถบด้านซ้าย (Sidebar) -->
     <aside class="sidebar">
         <header class="header">
             <img src="https://i.postimg.cc/CLqYPRBp/sanea-khxng-loko-kes'tr-x-nthr-y-ni-rong-re-yn-(2).png" alt="โลโก้เกษตรอินทรีย์" class="header-logo">
@@ -271,7 +280,6 @@
         </div>
     </aside>
 
-    <!-- เนื้อหาหลักฝั่งขวา (Main Content) -->
     <main class="main-content">
         <div class="dashboard-content">
 
@@ -294,14 +302,12 @@
                 </div>
             </div>
 
-            <!-- กราฟแผนที่ประเทศไทย -->
             <div class="chart-box full-width" style="margin-bottom: 20px;">
                 <h3>🗺️ แผนที่แสดงความหนาแน่นของพื้นที่ทำการเกษตร (ไร่) แยกตามจังหวัด</h3>
                 <p style="font-size: 12px; color: #888; margin-top: -5px; margin-bottom: 10px;">(สีเข้ม = พื้นที่เกษตรมาก, สีอ่อน = พื้นที่เกษตรน้อย, วางเมาส์เพื่อดูรายละเอียด)</p>
                 <div id="thailand_map_div"></div>
             </div>
 
-            <!-- 3 กราฟด้านล่าง -->
             <div class="charts-grid">
                 <div class="chart-box">
                     <h3>📊 สัดส่วนสถานะโรงเรียน</h3>
@@ -451,28 +457,24 @@
 
         async function fetchData() {
             const tbody = document.getElementById('dataTableBody');
-            tbody.innerHTML = '<tr><td style="text-align: center; padding: 40px;"><h3 style="color: #1b5e20;">⏳ กำลังโหลดข้อมูลจากระบบ...</h3><p style="color: #666;">อาจใช้เวลาสักครู่ ขึ้นอยู่กับปริมาณข้อมูล</p></td></tr>';
+            tbody.innerHTML = '<tr><td colspan="100%" style="text-align: center; padding: 40px;"><h3 style="color: #1b5e20;">⏳ กำลังโหลดข้อมูลจากระบบ...</h3><p style="color: #666;">อาจใช้เวลาสักครู่ ขึ้นอยู่กับปริมาณข้อมูล</p></td></tr>';
             try {
                 const response = await fetch(API_URL);
                 globalData = await response.json(); 
                 filterLocalData(); 
             } catch (error) {
                 console.error("Error:", error);
-                tbody.innerHTML = '<tr><td style="text-align: center; color: red; padding: 30px;">เกิดข้อผิดพลาดในการดึงข้อมูล โปรดตรวจสอบการตั้งค่าสิทธิ์ API ของคุณ</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="100%" style="text-align: center; color: red; padding: 30px;">เกิดข้อผิดพลาดในการดึงข้อมูล โปรดตรวจสอบการตั้งค่าสิทธิ์ API ของคุณ</td></tr>';
             }
         }
 
-        // 🟢 แก้ไขฟังก์ชัน clearFilters ให้เคลียร์ค่าของ Select2 (สพด.) ได้อย่างสมบูรณ์
         function clearFilters() {
             document.getElementById('statusFilter').value = "";
             document.getElementById('spkFilter').value = "";
             document.getElementById('yearFilter').value = "";
             document.getElementById('schoolSearch').value = "";
             
-            // ล้างค่าของ Dropdown สพด. ออกให้ว่างเปล่า
             $('#spdFilter').val('').trigger('change.select2');
-            
-            // เรียกใช้ฟังก์ชันอัปเดตใหม่
             updateSpdDropdown(); 
         }
 
@@ -576,7 +578,7 @@
                     if (iso && (stats.area > 0 || stats.newCount > 0 || stats.oldCount > 0)) { 
                         
                         let tooltipHtml = `
-                            <div style="padding: 12px; min-width: 160px; font-family: 'Segoe UI', Tahoma, sans-serif;">
+                            <div style="padding: 12px; min-width: 160px; font-family: 'Sarabun', Tahoma, sans-serif;">
                                 <h4 style="margin: 0 0 10px 0; color: #1b5e20; border-bottom: 2px solid #e8f5e9; padding-bottom: 5px; font-size: 16px;">
                                     📍 จังหวัด${prov}
                                 </h4>
@@ -634,7 +636,7 @@
                     options: {
                         responsive: true, maintainAspectRatio: false,
                         plugins: {
-                            legend: { position: 'bottom' },
+                            legend: { position: 'bottom', labels: { font: { family: 'Sarabun' } } },
                             tooltip: {
                                 callbacks: {
                                     label: function(context) {
@@ -656,7 +658,6 @@
             const ctxBar = document.getElementById('barChart').getContext('2d');
             if (barChartInstance) barChartInstance.destroy();
 
-            // เพิ่มชื่อแกน X และ Y
             barChartInstance = new Chart(ctxBar, {
                 type: 'bar',
                 data: {
@@ -671,12 +672,13 @@
                     responsive: true, maintainAspectRatio: false,
                     scales: { 
                         x: {
-                            title: { display: true, text: 'หน่วยงาน (สพข.)', font: { size: 14, weight: 'bold' }, color: '#2e7d32' }
+                            title: { display: true, text: 'หน่วยงาน (สพข.)', font: { size: 14, weight: 'bold', family: 'Sarabun' }, color: '#2e7d32' },
+                            ticks: { font: { family: 'Sarabun' } }
                         },
                         y: { 
                             beginAtZero: true, 
-                            ticks: { stepSize: 1 },
-                            title: { display: true, text: 'จำนวนโรงเรียน (แห่ง)', font: { size: 14, weight: 'bold' }, color: '#2e7d32' }
+                            ticks: { stepSize: 1, font: { family: 'Sarabun' } },
+                            title: { display: true, text: 'จำนวนโรงเรียน (แห่ง)', font: { size: 14, weight: 'bold', family: 'Sarabun' }, color: '#2e7d32' }
                         } 
                     },
                     plugins: { legend: { display: false } }
@@ -689,7 +691,6 @@
             const ctxLine = document.getElementById('lineChart').getContext('2d');
             if (lineChartInstance) lineChartInstance.destroy();
 
-            // เพิ่มชื่อแกน X และ Y
             lineChartInstance = new Chart(ctxLine, {
                 type: 'line',
                 data: {
@@ -707,12 +708,13 @@
                     responsive: true, maintainAspectRatio: false,
                     scales: {
                         x: { 
-                            ticks: { autoSkip: true, maxRotation: 45, minRotation: 45 },
-                            title: { display: true, text: 'ปีงบประมาณที่เข้าร่วมโครงการ', font: { size: 14, weight: 'bold' }, color: '#2e7d32' }
+                            ticks: { autoSkip: true, maxRotation: 45, minRotation: 45, font: { family: 'Sarabun' } },
+                            title: { display: true, text: 'ปีงบประมาณที่เข้าร่วมโครงการ', font: { size: 14, weight: 'bold', family: 'Sarabun' }, color: '#2e7d32' }
                         },
                         y: { 
                             beginAtZero: true,
-                            title: { display: true, text: 'จำนวนโรงเรียน (แห่ง)', font: { size: 14, weight: 'bold' }, color: '#2e7d32' }
+                            ticks: { font: { family: 'Sarabun' } },
+                            title: { display: true, text: 'จำนวนโรงเรียน (แห่ง)', font: { size: 14, weight: 'bold', family: 'Sarabun' }, color: '#2e7d32' }
                         }
                     },
                     plugins: { legend: { display: false } }
@@ -752,7 +754,7 @@
                 tbody.innerHTML = bodyHtml;
             } else {
                 thead.innerHTML = '<tr><th>ผลการค้นหา</th></tr>';
-                tbody.innerHTML = '<tr><td style="text-align: center; padding: 30px;">ไม่พบข้อมูลโรงเรียนที่ตรงกับเงื่อนไขการค้นหา</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="100%" style="text-align: center; padding: 30px;">ไม่พบข้อมูลโรงเรียนที่ตรงกับเงื่อนไขการค้นหา</td></tr>';
             }
         }
     </script>
